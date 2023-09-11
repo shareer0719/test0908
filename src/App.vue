@@ -1,47 +1,83 @@
-<script setup>
+<script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import { ref } from 'vue'
+
+let id = 0
+
+const newTodo = ref('')
+const hideCompleted = ref(false)
+const todos = ref([
+  { 
+    id: id++, 
+    text: '澆花餵魚裝水', 
+    done: true 
+  },
+  { 
+    id: id++, 
+    text: '帶手機鑰匙錢包充電器雨衣', 
+    done: false 
+  },
+])
+const textCenter = ref('textCenter')
+const justifyContentCenter = ref('justifyContentCenter')
+
+function addTodo() {
+  todos.value.push({ id: id++, text: newTodo.value, done: false })
+  newTodo.value = ''
+}
+
+function removeTodo(todo) {
+  todos.value = todos.value.filter((t) => t !== todo)
+}
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <form @submit.prevent="addTodo">
+    <h1 :class="textCenter">出門檢查清單</h1>
+    <div :class="justifyContentCenter">
+      <div>
+        <button>新增代辦事項</button><br>
+        <input v-model="newTodo"><br>
+      </div>
+      <div>
+        <ul>
+          <li v-for="todo in todos" :key="todo.id">
+            <input type="checkbox" v-model="todo.done">
+            <span :class="{ done: todo.done }">{{ todo.text }}</span>
+            <button @click="removeTodo(todo)">刪除</button>
+          </li>
+        </ul>
+        <button @click="hideCompleted = !hideCompleted">
+          {{ hideCompleted ? '顯示全部' : '隱藏已完成事項' }}
+        </button>
+      </div>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  </form>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
+  form {
+    background-color: lightskyblue;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  ul {
+    list-style-type: none;
+  }
+  li {
+    padding: 10px;
+  }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
+  .textCenter {
+    text-align: center;
+  }
+  .justifyContentCenter {
     display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+    justify-content: center;
+    padding: 20px;
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
+  .done {
+    text-decoration: line-through;
   }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
